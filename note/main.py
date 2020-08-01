@@ -5,20 +5,37 @@ from note.display import DisplayModule as display
 from note.handler import handle
 import uuid
 import sys
-from collections import OrderedDict
 import readchar
+from PyInquirer import prompt
+from pprint import pprint
+from os import system, name
+
+def clear_screen():
+    """
+    Clear terminal
+    """
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+
+clear_screen()
 
 # TODO(nirabhra): Add reminders
-OPTIONS = OrderedDict()
-OPTIONS['1'] = 'Take a Note'
-OPTIONS['2'] = 'View all Notes'
-OPTIONS['3'] = 'View all Notes with id'
-OPTIONS['4'] = 'View Note <index>'
-OPTIONS['5'] = 'Delete a Note <index>'
-OPTIONS['6'] = 'View tags'
-OPTIONS['7'] = 'List all Notes for a Tag'
-OPTIONS['8'] = 'Delete a Tag <index>'
-OPTIONS['q'] = 'Done for now? - Exit :)'
+REV_OPTIONS = {
+    'Take a Note': '1',
+    'View all Notes': '2',
+    'View all Notes with id': '3',
+    'View Note <index>': '4',
+    'Delete a Note <index>': '5',
+    'View tags': '6',
+    'List all Notes for a Tag': '7',
+    'Delete a Tag <index>': '8',
+    'Done for now? - Exit :)': 'q',
+}
 
 argument_list = sys.argv
 
@@ -27,13 +44,20 @@ def interact():
     Interact for user input
     """
     ret_val = True
-    display.display_options(OPTIONS)
 
-    option = readchar.readkey()
-    if option == '\x03':
-        return False
+    questions = [
+        {
+            'type': 'list',
+            'name': 'choice',
+            'message': 'What would you like to do?',
+            'choices': [key for key, value in REV_OPTIONS.items()]
+        },
+    ]
+    answers = prompt(questions)
 
-    ret_val = handle.switch(option)
+    clear_screen()
+
+    ret_val = handle.switch(REV_OPTIONS[answers['choice']])
 
     return ret_val
 
