@@ -15,7 +15,8 @@ setuptools.setup(
     packages=['note'],
     install_requires=[
         'readchar',
-        'tabulate'
+        'tabulate',
+        'PyInquirer',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

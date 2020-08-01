@@ -1,4 +1,3 @@
-import click
 from note.handler import handle
 from note.display import DisplayModule as display
 
