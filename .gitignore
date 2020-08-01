@@ -4,3 +4,4 @@ pvenv
 dist/
 build/
 *egg-info*
+dev.py
