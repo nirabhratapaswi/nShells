@@ -1,53 +1,29 @@
-import sqlite3
-import os
-import stat
+import setuptools
 
-# TODO(nirabhra): change to relative path.
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-DB_FILE = os.path.join(DIR_PATH, 'nShells.db')
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
 
-def create_connection(db_file):
-    """
-    Create Connection to DB
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-    except Exception as e:
-        print(e)
-
-    return conn
-
-def create_table(conn, create_table_sql):
-    """
-    Create Table
-    """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Exception as e:
-        print(e)
-
-if not os.path.exists(DB_FILE):
-    os.mknod(DB_FILE)
-    os.chmod(DB_FILE, 0o640)
-
-conn = create_connection(DB_FILE)
-create_table_shells = "CREATE TABLE IF NOT EXISTS shells(shell_id TEXT PRIMARY KEY, vision TEXT, \
-                                    thought TEXT, tag_name TEXT, timestamp TEXT);"
-create_table_shells_tags = "CREATE TABLE IF NOT EXISTS shells_tags(shell_id TEXT, tag_id TEXT);"
-create_table_tags = "CREATE TABLE IF NOT EXISTS tags(tag_id TEXT PRIMARY KEY, tag_name TEXT);"
-
-class DbConnectionError(Exception):
-    """
-    Database Connection Error
-    """
-    pass
-
-if conn is not None:
-    create_table(conn, create_table_shells)
-    create_table(conn, create_table_shells_tags)
-    create_table(conn, create_table_tags)
-else:
-    print("Error! cannot create the database connection.")
-    raise DbConnectionError('Unable to open storage')
+setuptools.setup(
+    name='note-shell',
+    version='0.0.1',
+    author='Nirabhra Tapaswi',
+    author_email='nirabhratapaswi@gmail.com',
+    description='Command line tool for making notes',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    url='https://github.com/nirabhratapaswi/nShells',
+    packages=['note'],
+    install_requires=[
+        'readchar',
+        'tabulate'
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+    ],
+    entry_points={
+        'console_scripts': ['note=note.main:main'],
+    },
+    include_package_data=True
+)
