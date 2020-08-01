@@ -250,8 +250,9 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_9():
+    def _handle_option_9():
         """
+        Not accesible via console !
         OPERATION: READ
         View all shell_tags
         """
