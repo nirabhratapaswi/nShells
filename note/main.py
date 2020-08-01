@@ -8,21 +8,12 @@ import sys
 import readchar
 from PyInquirer import prompt
 from pprint import pprint
-from os import system, name
-
-def clear_screen():
-    """
-    Clear terminal
-    """
-    # for windows
-    if name == 'nt':
-        _ = system('cls')
-
-    # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = system('clear')
+from note.helpers import clear_screen
+from note.cli import cli
+from time import sleep
 
 clear_screen()
+argument_list = sys.argv
 
 # TODO(nirabhra): Add reminders
 REV_OPTIONS = {
@@ -36,8 +27,6 @@ REV_OPTIONS = {
     'Delete a Tag <index>': '8',
     'Done for now? - Exit :)': 'q',
 }
-
-argument_list = sys.argv
 
 def interact():
     """
@@ -71,5 +60,11 @@ def main():
     Main function
     """
     continue_ = True
-    while continue_:
-        continue_ = interact()
+
+    continue_ = cli.evaluate(argument_list[1:])
+
+    if continue_:
+        while continue_:
+            continue_ = interact()
+
+        clear_screen()
