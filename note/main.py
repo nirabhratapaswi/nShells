@@ -18,7 +18,6 @@ OPTIONS['5'] = 'Delete a Note <index>(select from list)'
 OPTIONS['6'] = 'View tags'
 OPTIONS['7'] = 'List all Notes for a Tag'
 OPTIONS['8'] = 'Delete a Tag <index>(select from list)'
-OPTIONS['9'] = 'View notes -> tags'
 OPTIONS['q'] = 'Done for now? - Exit :)'
 
 argument_list = sys.argv
