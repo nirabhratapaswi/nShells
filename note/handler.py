@@ -4,6 +4,8 @@ from note import crud
 from note.display import DisplayModule as display
 import readchar
 from PyInquirer import prompt
+from note.helpers import clear_screen
+from time import sleep
 
 class Handle(object):
     """
@@ -24,19 +26,29 @@ class Handle(object):
         return getattr(cls, 'handle_option_' + str(option), cls.incorrect_option)(*args)
 
     @classmethod
-    def handle_option_1(cls):
+    def handle_option_1(cls, title=None, description=None, tag_name=None):
         """
         OPERATION: CREATE
         Take a Note
         """
-        display.display_text('* - optional\n')
-        display.display_text('Title: ')
-        title = str(input())
-        display.display_text('Add some description: ')
-        description = str(input())
-        display.display_text('* Add a tag: ')
-        # TODO(nirabhra): have functionality for blank tag
-        tag_name = str(input())
+        if not title and not description and not tag_name:
+            display.display_text('* - optional\n')
+        if not title:
+            display.display_text('Title: ')
+            title = str(input())
+        else:
+            title = str(title)
+        if not description:
+            display.display_text('Add some description: ')
+            description = description or str(input())
+        else:
+            description = str(description)
+        if not tag_name:
+            display.display_text('* Add a tag: ')
+            # TODO(nirabhra): have functionality for blank tag
+            tag_name = tag_name or str(input())
+        else:
+            tag_name = str(tag_name)
 
         if tag_name == '' or tag_name == None:
             tag_name = cls._default_tag_name
@@ -87,14 +99,18 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_4():
+    def handle_option_4(index=None):
         """
         TODO(nirabhra): Add option to read by id
         OPERATION: READ
         View Note <index>(select from list)
         """
-        display.display_text('\nEnter index of the note to view: ')
-        index = int(input())
+        if not index:
+            display.display_text('\nEnter index of the note to view: ')
+            index = int(input())
+            clear_screen()
+        else:
+            index = int(index)
 
         note = crud.get_shell_by_offset(index - 1)
 
@@ -112,38 +128,48 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_5():
+    def handle_option_5(type_=None, index=None, shell_id=None):
         """
         OPERATION: DELETE
         Delete a Note
         """
         skip_delete = False
 
-        options = {
-            'Delete by index': '1',
-            'Delete by id': '2',
-        }
-        questions = [
-            {
-                'type': 'list',
-                'name': 'choice',
-                'message': 'Welcome! How may I help you?',
-                'choices': [key for key, value in options.items()]
-            },
-        ]
-        answers = prompt(questions)
+        if not type_:
+            options = {
+                'Delete by index': '1',
+                'Delete by id': '2',
+            }
+            questions = [
+                {
+                    'type': 'list',
+                    'name': 'choice',
+                    'message': 'Welcome! How may I help you?',
+                    'choices': [key for key, value in options.items()]
+                },
+            ]
+            answers = prompt(questions)
 
-        type_ = options[answers['choice']]
+            type_ = options[answers['choice']]
+        else:
+            type_ = str(type_)
 
         if str(type_) == '1':
-            display.display_text('Enter index of the note to delete: ')
-            index = int(input())
+            if not index:
+                display.display_text('Enter index of the note to delete: ')
+                index = int(input())
+            else:
+                index = int(index)
 
             note = crud.get_shell_by_offset(index - 1)
             shell_id = note['shell_id']
         elif str(type_) == '2':
-            display.display_text('Enter id of the note to delete: ')
-            shell_id = str(input())
+            if not shell_id:
+                display.display_text('Enter id of the note to delete: ')
+                shell_id = str(input())
+            else:
+                shell_id = str(shell_id)
+
             note = crud.get_shell_from_id(shell_id)
         else:
             display.display_text('Only 1 / 2 are valid delete choices .. aborting delete\n')
@@ -183,13 +209,16 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_7():
+    def handle_option_7(name=None):
         """
         OPERATION: READ
         List all Notes for a Tag
         """
-        display.display_text('Enter tag name: ')
-        name = str(input())
+        if not name:
+            display.display_text('Enter tag name: ')
+            name = str(input())
+        else:
+            name = str(name)
 
         tag = crud.get_tag_by_name(name)
 
@@ -203,43 +232,57 @@ class Handle(object):
         return True
 
     @classmethod
-    def handle_option_8(cls):
+    def handle_option_8(cls, type_=None, index=None, tag_id=None, name=None):
         """
         OPERATION: DELETE
         Delete a Tag <index>(select from list)
         """
         skip_delete = False
 
-        options = {
-            'Delete by index': '1',
-            'Delete by id': '2',
-            'Delete by name': '3',
-        }
-        questions = [
-            {
-                'type': 'list',
-                'name': 'choice',
-                'message': 'Welcome! How may I help you?',
-                'choices': [key for key, value in options.items()]
-            },
-        ]
-        answers = prompt(questions)
+        if not type_:
+            options = {
+                'Delete by index': '1',
+                'Delete by id': '2',
+                'Delete by name': '3',
+            }
+            questions = [
+                {
+                    'type': 'list',
+                    'name': 'choice',
+                    'message': 'Welcome! How may I help you?',
+                    'choices': [key for key, value in options.items()]
+                },
+            ]
+            answers = prompt(questions)
 
-        type_ = options[answers['choice']]
+            type_ = options[answers['choice']]
+        else:
+            type_ = str(type_)
 
         if str(type_) == '1':
-            display.display_text('Enter index of the tag to delete: ')
-            index = int(input())
+            if not index:
+                display.display_text('Enter index of the tag to delete: ')
+                index = int(input())
+            else:
+                index = int(index)
 
             tag = crud.get_tag_from_offset(index - 1)
             tag_id = tag['tag_id']
         elif str(type_) == '2':
-            display.display_text('Enter id of the tag to delete: ')
-            tag_id = str(input())
+            if not tag_id:
+                display.display_text('Enter id of the tag to delete: ')
+                tag_id = str(input())
+            else:
+                tag_id = str(tag_id)
+
             tag = crud.get_tag_from_id(tag_id)
         elif str(type_) == '3':
-            display.display_text('Enter name of the tag to delete: ')
-            name = str(input())
+            if not name:
+                display.display_text('Enter name of the tag to delete: ')
+                name = str(input())
+            else:
+                name = str(name)
+
             tag = crud.get_tag_by_name(name)
             tag_id = tag['tag_id']
         else:
@@ -311,9 +354,15 @@ class Handle(object):
         """
         Done for now? - Exit :)
         """
-        display.display_text('Your notes are saved safely, keep using notes! Bye ..')
+        farewell_text = 'Thankyou for using notes!\nBye 🖐'
 
-        display.display_text('\n')
+        total_animation_time = 1.5
+        animation_speed = total_animation_time / len(farewell_text)
+        for i in range(0, len(farewell_text)):
+            display.display_text(farewell_text[i])
+            sleep(animation_speed)
+
+        sleep(0.75)
 
         return False
 
