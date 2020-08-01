@@ -5,8 +5,9 @@ class DisplayModule(object):
     """
     Display Module
     """
-    SHELL_FILTERS = ['vision', 'thought', 'tag_name']
+    SHELL_FILTERS = ['vision', 'thought', 'tag_name', 'created']
     TAG_FILTERS = ['tag_name']
+    SHELL_TAG_FILTERS = ['shell_id', 'tag_id']
 
     @staticmethod
     def display_options(options=None):
@@ -86,6 +87,40 @@ class DisplayModule(object):
                 table,
                 headers=[header.capitalize() for header in cls.TAG_FILTERS],
                 showindex=range(1, len(tags)+1),
+                stralign='center',
+                numalign='center',
+                tablefmt='fancy_grid'
+            ))
+        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n\n')
+
+        sys.stdout.flush()
+
+    @classmethod
+    def convert_shell_tags_to_table_format(cls, tags):
+        table = [
+            list(
+                map(
+                    lambda kv: kv[1] if len(kv[1]) < 51 else ''.join([kv[1][:47], '...']),
+                    filter(
+                        lambda kv: kv[0] in cls.SHELL_TAG_FILTERS,
+                        [kv for kv in tag.items()]
+                ))) for tag in tags
+        ]
+
+        return table
+
+    @classmethod
+    def display_shell_tags(cls, shell_tags=None):
+        shell_tags = shell_tags if shell_tags and isinstance(shell_tags, list) else []
+
+        table = cls.convert_shell_tags_to_table_format(shell_tags)
+
+        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n')
+        sys.stdout.write(
+            tabulate(
+                table,
+                headers=[header.capitalize() for header in cls.SHELL_TAG_FILTERS],
+                showindex=range(1, len(shell_tags)+1),
                 stralign='center',
                 numalign='center',
                 tablefmt='fancy_grid'

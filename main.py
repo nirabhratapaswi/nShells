@@ -1,8 +1,8 @@
-import setup
+import db_setup
 from datetime import datetime
 from helpers import crud
 from helpers.display import DisplayModule as display
-from helpers.handler import Handle as handle
+from helpers.handler import handle
 import uuid
 import sys
 from collections import OrderedDict
@@ -18,6 +18,7 @@ OPTIONS['5'] = 'Delete a Note <index>(select from list)'
 OPTIONS['6'] = 'View tags'
 OPTIONS['7'] = 'List all Notes for a Tag'
 OPTIONS['8'] = 'Delete a Tag <index>(select from list)'
+OPTIONS['9'] = 'View notes -> tags'
 OPTIONS['q'] = 'Done for now? - Exit :)'
 
 def interact():
