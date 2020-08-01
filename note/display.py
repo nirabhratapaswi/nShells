@@ -44,10 +44,11 @@ class DisplayModule(object):
         notes = notes if notes and isinstance(notes, list) else []
 
         filters = ['shell_id'] + cls.SHELL_FILTERS if include_id else cls.SHELL_FILTERS
+        if include_id:
+            filters.remove('thought')
 
         table = cls.convert_shells_to_table_format(notes, filters)
 
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n')
         sys.stdout.write(
             tabulate(
                 table,
@@ -57,7 +58,7 @@ class DisplayModule(object):
                 numalign='center',
                 tablefmt='fancy_grid'
             ))
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n\n')
+        sys.stdout.write('\n\n')
 
         sys.stdout.flush()
 
@@ -81,7 +82,6 @@ class DisplayModule(object):
 
         table = cls.convert_tags_to_table_format(tags)
 
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n')
         sys.stdout.write(
             tabulate(
                 table,
@@ -91,7 +91,7 @@ class DisplayModule(object):
                 numalign='center',
                 tablefmt='fancy_grid'
             ))
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n\n')
+        sys.stdout.write('\n\n')
 
         sys.stdout.flush()
 
@@ -115,7 +115,6 @@ class DisplayModule(object):
 
         table = cls.convert_shell_tags_to_table_format(shell_tags)
 
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n')
         sys.stdout.write(
             tabulate(
                 table,
@@ -125,6 +124,6 @@ class DisplayModule(object):
                 numalign='center',
                 tablefmt='fancy_grid'
             ))
-        sys.stdout.write(f'\n\n{"_"*100}\n{"~"*100}\n\n')
+        sys.stdout.write('\n\n')
 
         sys.stdout.flush()
