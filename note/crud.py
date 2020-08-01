@@ -57,7 +57,7 @@ def list_shells_compact():
     DB: shells
     List All Shells
     """
-    query = 'SELECT vision, thought, tag_name FROM shells;'
+    query = 'SELECT vision, thought, tag_name, created FROM shells;'
     cur = conn.cursor()
     cur.execute(query)
     data = []
@@ -66,6 +66,7 @@ def list_shells_compact():
             'vision': row[0],
             'thought': row[1],
             'tag_name': row[2],
+            'created': row[3],
         })
     return data
 

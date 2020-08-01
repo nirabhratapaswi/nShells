@@ -13,12 +13,11 @@ OPTIONS = OrderedDict()
 OPTIONS['1'] = 'Take a Note'
 OPTIONS['2'] = 'View all Notes'
 OPTIONS['3'] = 'View all Notes with id'
-OPTIONS['4'] = 'View Note <index>(select from list)'
-OPTIONS['5'] = 'Delete a Note <index>(select from list)'
+OPTIONS['4'] = 'View Note <index>'
+OPTIONS['5'] = 'Delete a Note <index>'
 OPTIONS['6'] = 'View tags'
 OPTIONS['7'] = 'List all Notes for a Tag'
-OPTIONS['8'] = 'Delete a Tag <index>(select from list)'
-OPTIONS['9'] = 'View notes -> tags'
+OPTIONS['8'] = 'Delete a Tag <index>'
 OPTIONS['q'] = 'Done for now? - Exit :)'
 
 argument_list = sys.argv
