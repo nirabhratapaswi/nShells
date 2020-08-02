@@ -1,3 +1,4 @@
 readchar
 tabulate
 PyInquirer
+sqlite3
