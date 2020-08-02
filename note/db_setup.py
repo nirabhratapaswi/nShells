@@ -31,9 +31,8 @@ def create_connection(db_file):
     return conn
 
 def create_table(conn, create_table_sql):
-    """
-    Create Table
-    """
+    """ Create Table """
+
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
