@@ -47,6 +47,7 @@ tables = (
                                     thought TEXT, tag_name TEXT, created timestamp);',
     'CREATE TABLE IF NOT EXISTS shells_tags(shell_id TEXT, tag_id TEXT);',
     'CREATE TABLE IF NOT EXISTS tags(tag_id TEXT PRIMARY KEY, tag_name TEXT);',
+    'CREATE VIRTUAL TABLE IF NOT EXISTS shells_search USING fts5(vision, thought, shell_id);'
 )
 
 if conn is not None:
