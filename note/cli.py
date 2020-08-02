@@ -104,8 +104,9 @@ class Cli(object):
         return False
 
     @staticmethod
-    def cli_viewnote(id):
-        handle.handle_option_4(id)
+    def cli_viewnote(id_):
+        type_ = '2' if id_ else None
+        handle.handle_option_4(type_=type_, id_=id_)
         return False
 
     @staticmethod

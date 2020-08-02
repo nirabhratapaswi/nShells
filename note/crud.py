@@ -9,15 +9,6 @@ def create_shell(data):
     conn.commit()
     return cur.lastrowid
 
-def create_shell_tag(data):
-    """ Db shells_tags : Create Shell Tag """
-
-    query = 'INSERT INTO shells_tags(shell_id, tag_id) VALUES(?, ?);'
-    cur = conn.cursor()
-    cur.execute(query, data)
-    conn.commit()
-    return cur.lastrowid
-
 def create_tag(data):
     """ Db tags : Create Tag """
 
@@ -62,28 +53,13 @@ def list_shells_compact():
 def list_tags():
     """ Db tags : List All Tags """
 
-    query = 'SELECT tag_id, tag_name FROM tags;'
+    query = 'SELECT DISTINCT tag_name FROM shells;'
     cur = conn.cursor()
     cur.execute(query)
     data = []
     for row in cur:
         data.append({
-            'tag_id': row[0],
-            'tag_name': row[1],
-        })
-    return data
-
-def list_shell_tags():
-    """ Db tags : List All Tags """
-
-    query = 'SELECT shell_id, tag_id FROM shells_tags;'
-    cur = conn.cursor()
-    cur.execute(query)
-    data = []
-    for row in cur:
-        data.append({
-            'shell_id': row[0],
-            'tag_id': row[1],
+            'tag_name': row[0],
         })
     return data
 
@@ -147,63 +123,21 @@ def get_shell_from_id(id=''):
 
     return data
 
-def get_tag_by_name(name):
-    """ Db tags : Get nth row of tags """
+def get_shells_from_tag(tag):
+    """ Db shells : Get shells from tag """
 
-    query = f'SELECT tag_id, tag_name FROM tags WHERE tag_name="{name}";'
-    cur = conn.cursor()
-    cur.execute(query)
-    data = None
-    for row in cur:
-        data = {
-            'tag_id': row[0],
-            'tag_name': row[1],
-        }
-        break
-
-    return data
-
-def get_tag_from_offset(offset):
-    """ Db tags : Get nth row of tags """
-
-    query = f'SELECT tag_id, tag_name FROM tags LIMIT 1 OFFSET {str(offset)};'
-    cur = conn.cursor()
-    cur.execute(query)
-    data = None
-    for row in cur:
-        data = {
-            'tag_id': row[0],
-            'tag_name': row[1],
-        }
-        break
-
-    return data
-
-def get_tag_from_id(id=''):
-    """ Db tags : Get tags from id """
-
-    query = f'SELECT tag_id, tag_name FROM tags WHERE tag_id="{id}";'
-    cur = conn.cursor()
-    cur.execute(query)
-    data = None
-    for row in cur:
-        data = {
-            'tag_id': row[0],
-            'tag_name': row[1],
-        }
-        break
-
-    return data
-
-def get_shell_ids_from_tag_id(id):
-    """ Db shells_tags : Get all shell ids associated to a tag """
-
-    query = f'SELECT shell_id FROM shells_tags WHERE tag_id="{id}";'
+    query = f'SELECT shell_id, vision, thought, tag_name, created FROM shells WHERE tag_name="{tag}";'
     cur = conn.cursor()
     cur.execute(query)
     data = []
     for row in cur:
-        data.append(row[0])
+        data.append({
+            'shell_id': row[0],
+            'vision': row[1],
+            'thought': row[2],
+            'tag_name': row[3],
+            'created': row[4],
+        })
 
     return data
 
@@ -246,30 +180,33 @@ def delete_shell_by_tag_name(name):
     conn.commit()
     return cur.lastrowid
 
-# def delete_shell_tag(shell_id, tag_id):
-def delete_shell_tag(data):
-    """ Db shells_tags : Delete shell tag """
+# Ft5 table for search
 
-    query = 'DELETE FROM shells_tags WHERE shell_id=? AND tag_id=?;'
+def create_shell_search(data):
+    """ Db shells_search : Save entry to Shell Search """
+
+    query = 'INSERT INTO shells_search(vision, thought, shell_id) VALUES(?, ?, ?);'
     cur = conn.cursor()
     cur.execute(query, data)
     conn.commit()
     return cur.lastrowid
 
-def delete_shell_tag_from_tag(id):
-    """ Db shells_tags : Delete shell tag """
-
-    query = f'DELETE FROM shells_tags WHERE tag_id="{id}";'
+def search_shell(text):
+    """ Db shells_search : Search in shells for text """
+    query = f'''SELECT shell_id, vision, thought, tag_name, created FROM shells WHERE shell_id IN
+                (
+                    SELECT shell_id FROM shells_search
+                    WHERE vision MATCH "{text}" OR thought MATCH "{text}" ORDER BY rank
+                ) ORDER BY created ASC;'''
     cur = conn.cursor()
     cur.execute(query)
-    conn.commit()
-    return cur.lastrowid
-
-def delete_tag(id):
-    """ Db tags : Delete Tag """
-
-    query = f'DELETE FROM tags WHERE tag_id="{id}";'
-    cur = conn.cursor()
-    cur.execute(query)
-    conn.commit()
-    return cur.lastrowid
+    data = []
+    for row in cur:
+        data.append({
+            'shell_id': row[0],
+            'vision': row[1],
+            'thought': row[2],
+            'tag_name': row[3],
+            'created': row[4],
+        })
+    return data
