@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='note-shell',
-    version='1.2.3',
+    version='1.3.0',
     author='Nirabhra Tapaswi',
     author_email='nirabhratapaswi@gmail.com',
     description='Command line tool for making notes',
