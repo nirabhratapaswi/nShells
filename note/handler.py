@@ -11,6 +11,7 @@ from time import sleep
 from note.helpers import clear_screen
 from note import crud
 from note.display import DisplayModule as display
+from click import edit as editor
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 NOTES_HISTORY_FILE = os.path.join(DIR_PATH, 'notes_history.txt')
@@ -75,6 +76,18 @@ def select_from_tags():
     clear_screen()
 
     return tag
+
+
+def edit_text(text, marker):
+    """
+    TODO(nirabhra): Edit option in cli
+    Edit text in editor
+    """
+    message = editor(text + marker)
+    if len(message.split(marker)) > 1:
+        return message.split(marker, 1)[0].rstrip('\n')
+
+    return ''
 
 class Handle(object):
     """
@@ -164,6 +177,63 @@ class Handle(object):
         display.display_text('\n')
 
         return True
+
+    @staticmethod
+    def get_note(type_=None, id_=None, text=None):
+        note = None
+        if not type_:
+            options = {
+                'Search': '1',
+                'Read by id': '2',
+                'List all': '3',
+                'Filter by tag': '4',
+            }
+            questions = [
+                {
+                    'type': 'list',
+                    'name': 'choice',
+                    'message': 'Please select an option: ',
+                    'choices': [key for key, value in options.items()]
+                },
+            ]
+            answers = prompt(questions)
+
+            type_ = options[answers['choice']]
+        else:
+            type_ = str(type_)
+
+        if str(type_) == '1':
+            if not text:
+                text = prompt_tk(
+                            '\nType to search: ',
+                            history=FileHistory(NOTES_HISTORY_FILE),
+                            auto_suggest=AutoSuggestFromHistory(),
+                        )
+                clear_screen()
+            else:
+                text = str(text)
+
+            shells = crud.search_shell(text)
+
+            note = select_from_shells(shells)
+        elif str(type_) == '2':
+            if not id_:
+                id_ = prompt_tk('\nEnter id of the note to view: ')
+                clear_screen()
+            else:
+                id_ = str(id_)
+
+            note = crud.get_shell_from_id(id_)
+        elif str(type_) == '3':
+            shells = crud.list_shells()
+
+            note = select_from_shells(shells)
+        elif str(type_) == '4':
+            tag = select_from_tags()
+            shells = crud.get_shells_from_tag(tag)
+            note = select_from_shells(shells)
+
+        return note
 
     @staticmethod
     def handle_option_4(type_=None, id_=None, text=None):
@@ -291,6 +361,7 @@ class Handle(object):
             display.display_text(f'\n')
 
         if key == 'y' or key == 'Y' or confirm:
+            crud.delete_shell_search(note['shell_id'])
             crud.delete_shell(note['shell_id'])
             display.display_text('Deleted successfully')
         else:
@@ -347,6 +418,8 @@ class Handle(object):
             display.display_text(f'\n')
 
         if (key == 'y' or key == 'Y' or confirm) and not skip_note_delete:
+            # Order is important: first delete search table then actual
+            crud.delete_shell_search_by_tag_name(tag_name)
             crud.delete_shell_by_tag_name(tag_name)
             display.display_text('\nNotes deleted successfully')
         elif not skip_note_delete:
@@ -356,6 +429,7 @@ class Handle(object):
 
         return True
 
+    # This method is protected currently
     @staticmethod
     def _handle_option_9():
         """
@@ -367,6 +441,29 @@ class Handle(object):
         display.display_shell_tags(shell_tags)
 
         display.display_text('\n')
+
+        return True
+
+    @classmethod
+    def handle_option_10(cls, type_=None, id_=None, text=None):
+        """
+        OPERATION: UPDATE
+        Edit a note
+        """
+        print('hello world')
+        note = cls.get_note(type_=type_, id_=id_, text=text)
+        print('note: ', note)
+
+        vision = edit_text(note["vision"], '\n\n# Edit vision')
+        thought = edit_text(note["thought"], '\n\n# Edit thought')
+        tag_name = edit_text(note["tag_name"], '\n\n# Edit tag')
+
+        print('vision edited: ', vision)
+        print('thought edited: ', thought)
+        print('tag edited: ', tag_name)
+
+        crud.update_shell(note['shell_id'], vision, thought, tag_name)
+        crud.update_shell_search(note['shell_id'], vision, thought)
 
         return True
 

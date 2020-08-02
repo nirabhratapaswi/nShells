@@ -18,12 +18,13 @@ argument_list = sys.argv
 REV_OPTIONS = {
     'Take a Note': '1',
     'View all Notes': '2',
-    'View all Notes with id': '3',
+    'Edit Note': '10',
+    'Filter Notes by Tag': '7',
     'View Note': '4',
-    'Delete a Note': '5',
     'View tags': '6',
-    'List all Notes for a Tag': '7',
+    'Delete a Note': '5',
     'Delete a Tag': '8',
+    'View all Notes with id': '3',
     'Done for now? - Exit :)': 'q',
 }
 
@@ -44,6 +45,8 @@ def interact():
     answers = prompt(questions)
 
     clear_screen()
+
+    # print('selected: ', REV_OPTIONS[answers['choice']])
 
     ret_val = handle.switch(REV_OPTIONS[answers['choice']])
 
