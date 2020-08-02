@@ -1,5 +1,6 @@
 import sys
 from tabulate import tabulate
+from note.helpers import type_check, format_for_tabulate
 
 class DisplayModule(object):
     """
@@ -25,35 +26,28 @@ class DisplayModule(object):
         sys.stdout.write(text)
         sys.stdout.flush()
 
-    @classmethod
-    def convert_shells_to_table_format(cls, notes, filters):
-        table = [
-            list(
-                map(
-                    lambda kv: kv[1] if len(kv[1]) < 51 else ''.join([kv[1][:47], '...']),
-                    filter(
-                        lambda kv: kv[0] in filters,
-                        [kv for kv in note.items()]
-                ))) for note in notes
-        ]
+    @staticmethod
+    def display_obj_as_table(obj, filters, include_keys=None, exclude_keys=None):
+        obj = type_check(obj, (list, tuple), default=())
+        # 'filters' needs to be mutable
+        filters = list(type_check(filters, (list, tuple), default=()))
+        include_keys = type_check(include_keys, (list, tuple), default=())
+        exclude_keys = type_check(exclude_keys, (list, tuple), default=())
 
-        return table
+        filters = list(
+            filter(
+                lambda x: x not in exclude_keys,
+                filters
+        ))
+        filters = filters + list(include_keys)
 
-    @classmethod
-    def display_notes(cls, notes=None, include_id=False):
-        notes = notes if notes and isinstance(notes, list) else []
-
-        filters = ['shell_id'] + cls.SHELL_FILTERS if include_id else cls.SHELL_FILTERS
-        if include_id:
-            filters.remove('thought')
-
-        table = cls.convert_shells_to_table_format(notes, filters)
+        table = format_for_tabulate(obj, filters)
 
         sys.stdout.write(
             tabulate(
                 table,
                 headers=[header.capitalize() for header in filters],
-                showindex=range(1, len(notes)+1),
+                showindex=range(1, len(obj)+1),
                 stralign='center',
                 numalign='center',
                 tablefmt='fancy_grid'
@@ -63,67 +57,16 @@ class DisplayModule(object):
         sys.stdout.flush()
 
     @classmethod
-    def convert_tags_to_table_format(cls, tags):
-        table = [
-            list(
-                map(
-                    lambda kv: kv[1] if len(kv[1]) < 51 else ''.join([kv[1][:47], '...']),
-                    filter(
-                        lambda kv: kv[0] in cls.TAG_FILTERS,
-                        [kv for kv in tag.items()]
-                ))) for tag in tags
-        ]
+    def display_notes(cls, notes=None, include_id=False):
+        include_keys = ['shell_id'] if include_id else None
+        exclude_keys = ['thought'] if include_id else None
 
-        return table
+        cls.display_obj_as_table(notes, cls.SHELL_FILTERS, include_keys=include_keys, exclude_keys=exclude_keys)
 
     @classmethod
     def display_tags(cls, tags=None):
-        tags = tags if tags and isinstance(tags, list) else []
-
-        table = cls.convert_tags_to_table_format(tags)
-
-        sys.stdout.write(
-            tabulate(
-                table,
-                headers=[header.capitalize() for header in cls.TAG_FILTERS],
-                showindex=range(1, len(tags)+1),
-                stralign='center',
-                numalign='center',
-                tablefmt='fancy_grid'
-            ))
-        sys.stdout.write('\n\n')
-
-        sys.stdout.flush()
-
-    @classmethod
-    def convert_shell_tags_to_table_format(cls, tags):
-        table = [
-            list(
-                map(
-                    lambda kv: kv[1] if len(kv[1]) < 51 else ''.join([kv[1][:47], '...']),
-                    filter(
-                        lambda kv: kv[0] in cls.SHELL_TAG_FILTERS,
-                        [kv for kv in tag.items()]
-                ))) for tag in tags
-        ]
-
-        return table
+        cls.display_obj_as_table(tags, cls.TAG_FILTERS)
 
     @classmethod
     def display_shell_tags(cls, shell_tags=None):
-        shell_tags = shell_tags if shell_tags and isinstance(shell_tags, list) else []
-
-        table = cls.convert_shell_tags_to_table_format(shell_tags)
-
-        sys.stdout.write(
-            tabulate(
-                table,
-                headers=[header.capitalize() for header in cls.SHELL_TAG_FILTERS],
-                showindex=range(1, len(shell_tags)+1),
-                stralign='center',
-                numalign='center',
-                tablefmt='fancy_grid'
-            ))
-        sys.stdout.write('\n\n')
-
-        sys.stdout.flush()
+        cls.display_obj_as_table(shell_tags, cls.SHELL_TAG_FILTERS)

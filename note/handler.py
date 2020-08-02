@@ -44,9 +44,25 @@ class Handle(object):
         else:
             description = str(description)
         if not tag_name:
-            display.display_text('* Add a tag: ')
-            # TODO(nirabhra): have functionality for blank tag
-            tag_name = tag_name or str(input())
+            tags = crud.list_tags()
+            choices =  ['Create New'] + [t['tag_name'] for t in tags]
+            questions = [
+                {
+                    'type': 'list',
+                    'name': 'choice',
+                    'message': 'Choose a tag',
+                    'choices': choices
+                },
+            ]
+            answers = prompt(questions)
+
+            type_ = answers['choice']
+
+            if type_ == 'Create New':
+                display.display_text('*(leave blank for default) Add a tag: ')
+                tag_name = tag_name or str(input())
+            else:
+                tag_name = type_
         else:
             tag_name = str(tag_name)
 
@@ -99,25 +115,26 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_4(index=None):
+    def handle_option_4(id_=None):
         """
         TODO(nirabhra): Add option to read by id
         OPERATION: READ
-        View Note <index>(select from list)
+        View Note <id>(select from list)
         """
-        if not index:
-            display.display_text('\nEnter index of the note to view: ')
-            index = int(input())
+        if not id_:
+            display.display_text('\nEnter id of the note to view: ')
+            id_ = str(input())
             clear_screen()
         else:
-            index = int(index)
+            id_ = str(id_)
 
-        note = crud.get_shell_by_offset(index - 1)
+        note = crud.get_shell_from_id(id_)
 
-        display.display_text(f'Vision:    {note["vision"]}\n\n')
-        display.display_text(f'Thought:   {note["thought"]}\n\n')
-        display.display_text(f'Tag:       {note["tag_name"]}\n\n')
-        display.display_text(f'Timestamp: {note["created"].split(".")[0]}')
+        display.display_text(f'Vision  :   {note["vision"]}\n')
+        display.display_text(f'Thought :   {note["thought"]}\n\n')
+        display.display_text(f'Tag : {note["tag_name"]}\n')
+        display.display_text(f'Created on {note["created"].split(".")[0]} ; ')
+        display.display_text(f'id - {note["shell_id"]}')
 
         display.display_text('\n\n\n')
         display.display_text('Press any key to continue')
@@ -128,7 +145,7 @@ class Handle(object):
         return True
 
     @staticmethod
-    def handle_option_5(type_=None, index=None, shell_id=None):
+    def handle_option_5(type_=None, index=None, shell_id=None, confirm=False):
         """
         OPERATION: DELETE
         Delete a Note
@@ -137,8 +154,8 @@ class Handle(object):
 
         if not type_:
             options = {
-                'Delete by index': '1',
                 'Delete by id': '2',
+                'Delete by index': '1',
             }
             questions = [
                 {
@@ -176,20 +193,23 @@ class Handle(object):
             skip_delete = True
 
         if shell_id and not skip_delete:
-            vision_hint = note['vision'] if len(note['vision']) <= 25 else ''.join([note['vision'][:23], '...'])
-            display.display_text(f'\nAre you sure to delete {vision_hint} ?\n')
-            display.display_text(f'\nPress y to continue deletion ')
-            key = readchar.readkey()
-            display.display_text(f'\n')
-            if key == 'y' or key == 'Y':
+            key = 'n'
+            if not confirm:
+                vision_hint = note['vision'] if len(note['vision']) <= 25 else ''.join([note['vision'][:23], '...'])
+                display.display_text(f'\nAre you sure to delete {vision_hint} ?\n')
+                display.display_text(f'\nPress y to continue deletion ')
+                key = readchar.readkey()
+                display.display_text(f'\n')
+
+            if key == 'y' or key == 'Y' or confirm:
                 crud.delete_shell(shell_id)
                 tag = crud.get_tag_by_name(note['tag_name'])
                 crud.delete_shell_tag((shell_id, tag['tag_id']))
-                display.display_text('\nDeleted successfully')
+                display.display_text('Deleted successfully')
             else:
-                display.display_text('\nAborting ..')
+                display.display_text('Aborting ..')
         elif not skip_delete:
-            display.display_text('\nNote not found !')
+            display.display_text('Note not found !')
 
         display.display_text('\n')
 
@@ -232,7 +252,7 @@ class Handle(object):
         return True
 
     @classmethod
-    def handle_option_8(cls, type_=None, index=None, tag_id=None, name=None):
+    def handle_option_8(cls, type_=None, index=None, tag_id=None, name=None, confirm=False):
         """
         OPERATION: DELETE
         Delete a Tag <index>(select from list)
@@ -241,9 +261,9 @@ class Handle(object):
 
         if not type_:
             options = {
-                'Delete by index': '1',
-                'Delete by id': '2',
                 'Delete by name': '3',
+                'Delete by id': '2',
+                'Delete by index': '1',
             }
             questions = [
                 {
@@ -291,17 +311,18 @@ class Handle(object):
 
         if tag_id and not skip_delete:
             # Delete tag
+            key = 'n'
             skip_note_delete = False
             tag_hint = tag['tag_name'] if len(tag['tag_name']) <= 25 else ''.join([tag['tag_name'][:23], '...'])
             associated_shell_ids = crud.get_shell_ids_from_tag_id(tag_id)
 
-            display.display_text(f'\nAre you sure to delete tag "{tag_hint}" ?\n')
-            display.display_text(f'Press y to continue deletion ')
+            if not confirm:
+                display.display_text(f'\nAre you sure to delete tag "{tag_hint}" ?\n')
+                display.display_text(f'Press y to continue deletion ')
+                key = readchar.readkey()
+                display.display_text(f'\n')
 
-            key = readchar.readkey()
-            display.display_text(f'\n')
-
-            if key == 'y' or key == 'Y':
+            if key == 'y' or key == 'Y' or confirm:
                 crud.delete_tag(tag_id)
                 crud.delete_shell_tag_from_tag((tag_id))
                 display.display_text('\nTag deleted successfully')
@@ -309,13 +330,16 @@ class Handle(object):
                 skip_note_delete = True
                 display.display_text('\nAborting ..\n')
 
-
             # Delete associated notes
-            display.display_text(f'\nDelete associated notes?\n')
-            display.display_text(f'Press y to continue deletion ')
-            key = readchar.readkey()
-            display.display_text(f'\n')
-            if (key == 'y' or key == 'Y') and not skip_note_delete:
+            key = 'n'
+
+            if not confirm:
+                display.display_text(f'\nDelete associated notes?\n')
+                display.display_text(f'Press y to continue deletion ')
+                key = readchar.readkey()
+                display.display_text(f'\n')
+
+            if (key == 'y' or key == 'Y' or confirm) and not skip_note_delete:
                 crud.delete_shell_by_tag_name(tag['tag_name'])
                 display.display_text('\nNotes deleted successfully')
             elif not skip_note_delete:

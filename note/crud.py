@@ -1,10 +1,8 @@
 from note.db_setup import conn
 
 def create_shell(data):
-    """
-    DB: shells
-    Create Shell
-    """
+    """ Db shells : Create Shell """
+
     query = 'INSERT INTO shells(shell_id, vision, thought, tag_name, created) VALUES(?, ?, ?, ?, ?);'
     cur = conn.cursor()
     cur.execute(query, data)
@@ -12,10 +10,8 @@ def create_shell(data):
     return cur.lastrowid
 
 def create_shell_tag(data):
-    """
-    DB: shells_tags
-    Create Shell Tag
-    """
+    """ Db shells_tags : Create Shell Tag """
+
     query = 'INSERT INTO shells_tags(shell_id, tag_id) VALUES(?, ?);'
     cur = conn.cursor()
     cur.execute(query, data)
@@ -23,10 +19,8 @@ def create_shell_tag(data):
     return cur.lastrowid
 
 def create_tag(data):
-    """
-    DB: tags
-    Create Tag
-    """
+    """ Db tags : Create Tag """
+
     query = 'INSERT INTO tags(tag_id, tag_name) VALUES(?, ?);'
     cur = conn.cursor()
     cur.execute(query, data)
@@ -34,10 +28,8 @@ def create_tag(data):
     return cur.lastrowid
 
 def list_shells():
-    """
-    DB: shells
-    List All Shells
-    """
+    """ Db shells : List All Shells """
+
     query = 'SELECT shell_id, vision, thought, tag_name, created FROM shells;'
     cur = conn.cursor()
     cur.execute(query)
@@ -53,10 +45,7 @@ def list_shells():
     return data
 
 def list_shells_compact():
-    """
-    DB: shells
-    List All Shells
-    """
+    """ Db shells : List All Shells """
     query = 'SELECT vision, thought, tag_name, created FROM shells;'
     cur = conn.cursor()
     cur.execute(query)
@@ -71,10 +60,8 @@ def list_shells_compact():
     return data
 
 def list_tags():
-    """
-    DB: tags
-    List All Tags
-    """
+    """ Db tags : List All Tags """
+
     query = 'SELECT tag_id, tag_name FROM tags;'
     cur = conn.cursor()
     cur.execute(query)
@@ -87,10 +74,8 @@ def list_tags():
     return data
 
 def list_shell_tags():
-    """
-    DB: tags
-    List All Tags
-    """
+    """ Db tags : List All Tags """
+
     query = 'SELECT shell_id, tag_id FROM shells_tags;'
     cur = conn.cursor()
     cur.execute(query)
@@ -103,10 +88,8 @@ def list_shell_tags():
     return data
 
 def get_shell_by_offset(offset):
-    """
-    DB: shells
-    Get nth row of shells
-    """
+    """ Db shells : Get nth row of shells """
+
     query = f'SELECT shell_id, vision, thought, tag_name, created FROM shells LIMIT 1 OFFSET {str(offset)};'
     cur = conn.cursor()
     cur.execute(query)
@@ -124,10 +107,8 @@ def get_shell_by_offset(offset):
     return data
 
 def get_shell_from_ids(id_list=None):
-    """
-    DB: shells
-    Get shell from id_list
-    """
+    """ Db shells : Get shell from id_list """
+
     id_list = id_list if id_list and (isinstance(id_list, list) or isinstance(id_list, tuple)) else ()
     id_list = [id.join(['"', '"']) for id in id_list]
     query = f'SELECT shell_id, vision, thought, tag_name, created \
@@ -148,10 +129,8 @@ def get_shell_from_ids(id_list=None):
     return data
 
 def get_shell_from_id(id=''):
-    """
-    DB: shells
-    Get shell from id
-    """
+    """ Db shells : Get shell from id """
+
     query = f'SELECT shell_id, vision, thought, tag_name, created FROM shells WHERE shell_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -169,10 +148,8 @@ def get_shell_from_id(id=''):
     return data
 
 def get_tag_by_name(name):
-    """
-    DB: tags
-    Get nth row of tags
-    """
+    """ Db tags : Get nth row of tags """
+
     query = f'SELECT tag_id, tag_name FROM tags WHERE tag_name="{name}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -187,10 +164,8 @@ def get_tag_by_name(name):
     return data
 
 def get_tag_from_offset(offset):
-    """
-    DB: tags
-    Get nth row of tags
-    """
+    """ Db tags : Get nth row of tags """
+
     query = f'SELECT tag_id, tag_name FROM tags LIMIT 1 OFFSET {str(offset)};'
     cur = conn.cursor()
     cur.execute(query)
@@ -205,10 +180,8 @@ def get_tag_from_offset(offset):
     return data
 
 def get_tag_from_id(id=''):
-    """
-    DB: tags
-    Get tags from id
-    """
+    """ Db tags : Get tags from id """
+
     query = f'SELECT tag_id, tag_name FROM tags WHERE tag_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -223,10 +196,8 @@ def get_tag_from_id(id=''):
     return data
 
 def get_shell_ids_from_tag_id(id):
-    """
-    DB: shells_tags
-    Get all shell ids associated to a tag
-    """
+    """ Db shells_tags : Get all shell ids associated to a tag """
+
     query = f'SELECT shell_id FROM shells_tags WHERE tag_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -237,10 +208,8 @@ def get_shell_ids_from_tag_id(id):
     return data
 
 def get_shell_ids_from_tag_name(name):
-    """
-    DB: shells
-    Get all shell ids associated with a tag name
-    """
+    """ Db shells : Get all shell ids associated with a tag name """
+
     query = f'SELECT shell_id FROM shells WHERE tag_name="{name}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -251,10 +220,8 @@ def get_shell_ids_from_tag_name(name):
     return data
 
 def update_shell_update_tag_to_default(tag_name, updated_name='default'):
-    """
-    DB: shells
-    Update Shell
-    """
+    """ Db shells : Update Shell """
+
     query = f'UPDATE shells SET tag_name="{updated_name}" WHERE tag_name="{tag_name}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -262,10 +229,8 @@ def update_shell_update_tag_to_default(tag_name, updated_name='default'):
     return cur.lastrowid
 
 def delete_shell(id):
-    """
-    DB: shells
-    Delete Shell
-    """
+    """ Db shells : Delete Shell """
+
     query = f'DELETE FROM shells WHERE shell_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -273,10 +238,8 @@ def delete_shell(id):
     return cur.lastrowid
 
 def delete_shell_by_tag_name(name):
-    """
-    DB: shells
-    Delete Shell
-    """
+    """ Db shells : Delete Shell """
+
     query = f'DELETE FROM shells WHERE tag_name="{name}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -285,10 +248,8 @@ def delete_shell_by_tag_name(name):
 
 # def delete_shell_tag(shell_id, tag_id):
 def delete_shell_tag(data):
-    """
-    DB: shells_tags
-    Delete shell tag
-    """
+    """ Db shells_tags : Delete shell tag """
+
     query = 'DELETE FROM shells_tags WHERE shell_id=? AND tag_id=?;'
     cur = conn.cursor()
     cur.execute(query, data)
@@ -296,10 +257,8 @@ def delete_shell_tag(data):
     return cur.lastrowid
 
 def delete_shell_tag_from_tag(id):
-    """
-    DB: shells_tags
-    Delete shell tag
-    """
+    """ Db shells_tags : Delete shell tag """
+
     query = f'DELETE FROM shells_tags WHERE tag_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)
@@ -307,10 +266,8 @@ def delete_shell_tag_from_tag(id):
     return cur.lastrowid
 
 def delete_tag(id):
-    """
-    DB: tags
-    Delete Tag
-    """
+    """ Db tags : Delete Tag """
+
     query = f'DELETE FROM tags WHERE tag_id="{id}";'
     cur = conn.cursor()
     cur.execute(query)

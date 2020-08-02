@@ -19,9 +19,7 @@ class GenericError(Exception):
     pass
 
 def create_connection(db_file):
-    """
-    Create Connection to DB
-    """
+    """ Create Connection to DB """
     conn = None
     try:
         conn = sqlite3.connect(db_file)
@@ -31,9 +29,8 @@ def create_connection(db_file):
     return conn
 
 def create_table(conn, create_table_sql):
-    """
-    Create Table
-    """
+    """ Create Table """
+
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
@@ -45,14 +42,15 @@ if not os.path.exists(DB_FILE):
     os.chmod(DB_FILE, 0o640)
 
 conn = create_connection(DB_FILE)
-create_table_shells = "CREATE TABLE IF NOT EXISTS shells(shell_id TEXT PRIMARY KEY, vision TEXT, \
-                                    thought TEXT, tag_name TEXT, created timestamp);"
-create_table_shells_tags = "CREATE TABLE IF NOT EXISTS shells_tags(shell_id TEXT, tag_id TEXT);"
-create_table_tags = "CREATE TABLE IF NOT EXISTS tags(tag_id TEXT PRIMARY KEY, tag_name TEXT);"
+tables = (
+    'CREATE TABLE IF NOT EXISTS shells(shell_id TEXT PRIMARY KEY, vision TEXT, \
+                                    thought TEXT, tag_name TEXT, created timestamp);',
+    'CREATE TABLE IF NOT EXISTS shells_tags(shell_id TEXT, tag_id TEXT);',
+    'CREATE TABLE IF NOT EXISTS tags(tag_id TEXT PRIMARY KEY, tag_name TEXT);',
+)
 
 if conn is not None:
-    create_table(conn, create_table_shells)
-    create_table(conn, create_table_shells_tags)
-    create_table(conn, create_table_tags)
+    for table in tables:
+        create_table(conn, table)
 else:
     raise DbConnectionError('Unable to open storage')
