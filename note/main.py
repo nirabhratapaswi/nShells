@@ -7,7 +7,6 @@ import uuid
 import sys
 import readchar
 from PyInquirer import prompt
-from pprint import pprint
 from note.helpers import clear_screen
 from note.cli import cli
 from time import sleep
@@ -20,11 +19,11 @@ REV_OPTIONS = {
     'Take a Note': '1',
     'View all Notes': '2',
     'View all Notes with id': '3',
-    'View Note <index>': '4',
-    'Delete a Note <index>': '5',
+    'View Note': '4',
+    'Delete a Note': '5',
     'View tags': '6',
     'List all Notes for a Tag': '7',
-    'Delete a Tag <index>': '8',
+    'Delete a Tag': '8',
     'Done for now? - Exit :)': 'q',
 }
 
