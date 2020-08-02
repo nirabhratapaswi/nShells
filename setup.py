@@ -17,7 +17,7 @@ setuptools.setup(
         'readchar',
         'tabulate',
         'PyInquirer',
-        'sqlite3',
+        'pysqlite3',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
