@@ -149,6 +149,8 @@ class Cli(object):
         for key, value in cls.HELP_OPTIONS.items():
             value = value + ' '*(16-len(value)) if len(value) < 16 else value
             display.display_text(f'\t{value}\t\t{key}\n')
+
+        display.display_text('\n\nNOTE: cli is currenlt supports only single option\n')
         return False
 
     @staticmethod
