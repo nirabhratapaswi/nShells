@@ -1,11 +1,20 @@
+import os
 from datetime import datetime
 import uuid
+import readchar
+from prompt_toolkit import prompt as prompt_tk
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.contrib.completers import WordCompleter
+from PyInquirer import prompt
+from time import sleep
+from note.helpers import clear_screen
 from note import crud
 from note.display import DisplayModule as display
-import readchar
-from PyInquirer import prompt
-from note.helpers import clear_screen
-from time import sleep
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+NOTES_HISTORY_FILE = os.path.join(DIR_PATH, 'notes_history.txt')
+TAGS_HISTORY_FILE = os.path.join(DIR_PATH, 'tags_history.txt')
 
 def select_from_shells(shells=None):
     """ Select prompt for shells """
@@ -55,7 +64,13 @@ def select_from_tags():
     tag = answers['choice']
 
     if tag == 'Enter manually':
-        tag = str(input())
+        tag_word_completer = WordCompleter([tag['tag_name'] for tag in tags], ignore_case=True)
+        tag = prompt_tk(
+                        'Start Typing : ',
+                        history=FileHistory(TAGS_HISTORY_FILE),
+                        auto_suggest=AutoSuggestFromHistory(),
+                        completer=tag_word_completer,
+                    )
 
     clear_screen()
 
@@ -80,13 +95,11 @@ class Handle(object):
         if not title and not description and not tag_name:
             display.display_text('* - optional\n')
         if not title:
-            display.display_text('Title: ')
-            title = str(input())
+            title = prompt_tk('Title: ')
         else:
             title = str(title)
         if not description:
-            display.display_text('Add some description: ')
-            description = description or str(input())
+            description = prompt_tk('Add some description: ')
         else:
             description = str(description)
         if not tag_name:
@@ -105,8 +118,7 @@ class Handle(object):
             type_ = answers['choice']
 
             if type_ == 'Create New':
-                display.display_text('*(leave blank for default) Add a tag: ')
-                tag_name = tag_name or str(input())
+                tag_name = prompt_tk('*(leave blank for default) Add a tag: ')
             else:
                 tag_name = type_
         else:
@@ -183,8 +195,11 @@ class Handle(object):
 
         if str(type_) == '1':
             if not text:
-                display.display_text('\nType to search: ')
-                text = str(input())
+                text = prompt_tk(
+                            '\nType to search: ',
+                            history=FileHistory(NOTES_HISTORY_FILE),
+                            auto_suggest=AutoSuggestFromHistory(),
+                        )
                 clear_screen()
             else:
                 text = str(text)
@@ -194,8 +209,7 @@ class Handle(object):
             note = select_from_shells(shells)
         elif str(type_) == '2':
             if not id_:
-                display.display_text('\nEnter id of the note to view: ')
-                id_ = str(input())
+                id_ = prompt_tk('\nEnter id of the note to view: ')
                 clear_screen()
             else:
                 id_ = str(id_)
@@ -253,15 +267,13 @@ class Handle(object):
 
         if str(type_) == '1':
             if not shell_id:
-                display.display_text('Enter id of the note to delete: ')
-                shell_id = str(input())
+                shell_id = prompt_tk('\nEnter id of the note to delete: ')
             else:
                 shell_id = str(shell_id)
 
             note = crud.get_shell_from_id(shell_id)
         elif str(type_) == '2':
-            display.display_text('\nType to search: ')
-            text = str(input())
+            text = prompt_tk('\nType to search: ')
             clear_screen()
 
             shells = crud.search_shell(text)
@@ -273,7 +285,7 @@ class Handle(object):
         key = 'n'
         if not confirm:
             vision_hint = note['vision'] if len(note['vision']) <= 25 else ''.join([note['vision'][:23], '...'])
-            display.display_text(f'\nAre you sure to delete {vision_hint} ?\n')
+            display.display_text(f'\nAre you sure to delete "{vision_hint}" ?\n')
             display.display_text(f'\nPress y to continue deletion ')
             key = readchar.readkey()
             display.display_text(f'\n')
