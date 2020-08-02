@@ -13,6 +13,7 @@ class Cli(object):
         'List all notes in detail': '-ld -lnd --list-notes-detail',
         'List quick notes': '-lq --list-quick-notes',
         'View note': '-v -vn --view-note',
+        'Edit note': '-e -en --edit-note',
         'Delete a note': '-d -dn --delete-note',
         'List tags': '-lt --list-tags',
         'List notes with tag': '-lnt --list-notes-tag',
@@ -35,6 +36,9 @@ class Cli(object):
         '-v': 'viewnote',
         '-vn': 'viewnote',
         '-view-note': 'viewnote',
+        '-e': 'editnote',
+        '-en': 'editnote',
+        '--edit-note': 'editnote',
         '-d': 'deletenote',
         '-dn': 'deletenote',
         '--delete-note': 'deletenote',
@@ -104,9 +108,16 @@ class Cli(object):
         return False
 
     @staticmethod
-    def cli_viewnote(id_):
+    def cli_viewnote(id_, *args, **kwargs):
         type_ = '2' if id_ else None
         handle.handle_option_4(type_=type_, id_=id_)
+        return False
+
+    @staticmethod
+    def cli_editnote(id_, *args, **kwargs):
+        # TODO(nirabhra): Implement logic for _id
+        type_ = '2' if id_ else None
+        handle.handle_option_10(type_=type_, id_=id_)
         return False
 
     @staticmethod
