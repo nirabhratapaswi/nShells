@@ -2,3 +2,4 @@ readchar
 tabulate
 PyInquirer
 pysqlite3
+click

@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='note-shell',
-    version='1.4.0',
+    version='1.4.1',
     author='Nirabhra Tapaswi',
     author_email='nirabhratapaswi@gmail.com',
     description='Command line tool for making notes',
@@ -18,6 +18,7 @@ setuptools.setup(
         'tabulate',
         'PyInquirer',
         'pysqlite3',
+        'click',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
