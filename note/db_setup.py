@@ -38,7 +38,10 @@ def create_table(conn, create_table_sql):
         raise GenericError(str(e))
 
 if not os.path.exists(DB_FILE):
-    os.mknod(DB_FILE)
+    # Windows does not support mknod
+    # os.mknod(DB_FILE)
+
+    open(DB_FILE, 'w').close()
     os.chmod(DB_FILE, 0o640)
 
 conn = create_connection(DB_FILE)

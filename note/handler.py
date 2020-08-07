@@ -11,7 +11,9 @@ from time import sleep
 from note.helpers import clear_screen
 from note import crud
 from note.display import DisplayModule as display
+from note.reminder import create_reminder
 from click import edit as editor
+from time import sleep
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 NOTES_HISTORY_FILE = os.path.join(DIR_PATH, 'notes_history.txt')
@@ -450,22 +452,34 @@ class Handle(object):
         OPERATION: UPDATE
         Edit a note
         """
-        print('hello world')
         note = cls.get_note(type_=type_, id_=id_, text=text)
-        print('note: ', note)
 
         vision = edit_text(note["vision"], '\n\n# Edit vision')
         thought = edit_text(note["thought"], '\n\n# Edit thought')
         tag_name = edit_text(note["tag_name"], '\n\n# Edit tag')
 
-        print('vision edited: ', vision)
-        print('thought edited: ', thought)
-        print('tag edited: ', tag_name)
-
         crud.update_shell(note['shell_id'], vision, thought, tag_name)
         crud.update_shell_search(note['shell_id'], vision, thought)
 
         return True
+
+    @staticmethod
+    def handle_option_11(delay=None, title=None, body=None):
+        """
+        OPERATION: CREATE
+        Create a Reminder
+        """
+        if not title:
+            title = prompt_tk('Title: ')
+        if not body:
+            body = prompt_tk('Details(optional)?: ')
+        if not delay:
+            delay = int(prompt_tk('Enter delay(in sec): '))
+
+        try:
+            r = create_reminder(delay, title, body)
+        except Exception as e:
+            display.display_text(f'Error: {str(e)}')
 
     @classmethod
     def handle_option_q(cls):

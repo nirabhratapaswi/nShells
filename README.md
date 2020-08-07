@@ -36,6 +36,7 @@ This project is built on the grounds of making noting down something (anything) 
 
 * [python](https://www.python.org/)
 * [pip](https://pip.pypa.io/en/stable/)
+* [notify-send](https://ss64.com/bash/notify-send.html) (this is required for reminder notifications, please install as per OS)
 
 ### Installation
 

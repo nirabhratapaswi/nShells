@@ -25,6 +25,7 @@ REV_OPTIONS = {
     'Delete a Note': '5',
     'Delete a Tag': '8',
     'View all Notes with id': '3',
+    'Create a reminder': '11',
     'Done for now? - Exit :)': 'q',
 }
 
