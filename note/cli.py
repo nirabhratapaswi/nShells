@@ -1,5 +1,6 @@
 from note.handler import handle
 from note.display import DisplayModule as display
+from note.reminder import create_reminder
 
 class Cli(object):
     """
@@ -17,6 +18,7 @@ class Cli(object):
         'Delete a note': '-d -dn --delete-note',
         'List tags': '-lt --list-tags',
         'List notes with tag': '-lnt --list-notes-tag',
+        'Set a reminder': '-r --reminder (<delay> "<title>" "<description>")',
         'Delete tag': '-dt --delete-tag',
     }
     CLI_OPTIONS = {
@@ -48,6 +50,8 @@ class Cli(object):
         '--list-notes-tag': 'listnotesfortag',
         '-dt': 'deletetag',
         '--delete-tag': 'deletetag',
+        '-r': 'setreminder',
+        '--reminder': 'setreminder',
         '-i': 'pass',
         '--interactive': 'pass',
         '-h': 'help',
@@ -151,6 +155,41 @@ class Cli(object):
         name = name.split(' ')[0] if name else None
         type_ = '3' if name else None
         handle.handle_option_8(type_=type_, name=name, confirm=yes)
+        return False
+
+    @staticmethod
+    def parse_msg_for_reminder(msg: str = None):
+        msg = msg or ''
+
+        delay = None
+        title = None
+        body = None
+
+        delay_spl = msg.split(' ')
+        if delay_spl[0] != '' and '-t' not in delay_spl[0] and '-d' not in delay_spl[0]:
+            try:
+                delay = int(delay_spl[0].strip())
+            except Exception:
+                pass
+
+        title_spl = msg.split('t:')
+        if len(title_spl) > 1:
+            title = ''.join(title_spl[1:])
+            if 'd:' in title:
+                title = title.split('d:')[0]
+
+        desc_spl = msg.split('d:')
+        if len(desc_spl) > 1:
+            body = ''.join(desc_spl[1:])
+            if 't:' in body:
+                body = body.split('t:')[0]
+
+        return delay, title, body
+
+    @classmethod
+    def cli_setreminder(cls, msg, *args, **kwargs):
+        delay, title, body = cls.parse_msg_for_reminder(msg)
+        handle.handle_option_11(delay, title, body)
         return False
 
     @classmethod
