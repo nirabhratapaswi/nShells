@@ -9,7 +9,6 @@ class DisplayModule(object):
     SHELL_FILTERS = ['vision', 'thought', 'tag_name', 'created']
     TAG_FILTERS = ['tag_name']
     SHELL_TAG_FILTERS = ['shell_id', 'tag_id']
-    REMINDER_FILTERS = ['title', 'body', 'target_time']
 
     @staticmethod
     def display_options(options=None):
@@ -71,10 +70,3 @@ class DisplayModule(object):
     @classmethod
     def display_shell_tags(cls, shell_tags=None):
         cls.display_obj_as_table(shell_tags, cls.SHELL_TAG_FILTERS)
-
-    @classmethod
-    def display_reminders(cls, reminders=None, include_id=False):
-        include_keys = ['reminder_id'] if include_id else None
-        exclude_keys = ['body'] if include_id else None
-
-        cls.display_obj_as_table(reminders, cls.REMINDER_FILTERS, include_keys=include_keys, exclude_keys=exclude_keys)

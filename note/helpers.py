@@ -1,8 +1,6 @@
 from os import system, name
 from functools import reduce
 from collections import OrderedDict
-import note.display as _nd
-from time import sleep
 
 def clear_screen():
     """
@@ -16,16 +14,7 @@ def clear_screen():
     else:
         _ = system('clear')
 
-def exit_animation(text: str, total_animation_time: float, pause_at_end: float = 0.75) -> None:
-    """ Exit animation """
-    animation_speed = total_animation_time / len(text)
-    for i in range(0, len(text)):
-        _nd.DisplayModule.display_text(text[i])
-        sleep(animation_speed)
-
-    sleep(pause_at_end)
-
-def type_check(element, target_types: list or tuple, default=None) -> any:
+def type_check(element, target_types: list or tuple, default=None):
     """
     Unbound Function to match an object to desired types, and return a default if unmatched
     """

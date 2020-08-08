@@ -9,7 +9,7 @@ from prompt_toolkit.contrib.completers import WordCompleter
 from PyInquirer import prompt
 from time import sleep
 from note.helpers import clear_screen
-from note import note_crud as crud
+from note import crud
 from note.display import DisplayModule as display
 from note.reminder import create_reminder
 from click import edit as editor
@@ -19,17 +19,9 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 NOTES_HISTORY_FILE = os.path.join(DIR_PATH, 'notes_history.txt')
 TAGS_HISTORY_FILE = os.path.join(DIR_PATH, 'tags_history.txt')
 
-STANDARD_MESSAGES = {
-    'notes_not_found': 'No notes found, start by creating one ->\n',
-    'tags_not_found': 'No tags found, start by creating your first note ->\n',
-}
-
 def select_from_shells(shells=None):
     """ Select prompt for shells """
     shells = shells if shells else crud.list_shells()
-    if not shells or len(shells) == 0:
-        return None
-
     shells_ = {
         element['shell_id']: element
         for element in shells
@@ -60,8 +52,6 @@ def select_from_shells(shells=None):
 def select_from_tags():
     """ Select prompt for tags """
     tags = crud.list_tags()
-    if not tags or len(tags) == 0:
-        return None
 
     options = ['Enter manually'] + [tag['tag_name'] for tag in tags]
     questions = [
@@ -190,8 +180,8 @@ class Handle(object):
 
         return True
 
-    @classmethod
-    def get_note(cls, type_=None, id_=None, text=None):
+    @staticmethod
+    def get_note(type_=None, id_=None, text=None):
         note = None
         if not type_:
             options = {
@@ -228,9 +218,6 @@ class Handle(object):
             shells = crud.search_shell(text)
 
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
         elif str(type_) == '2':
             if not id_:
                 id_ = prompt_tk('\nEnter id of the note to view: ')
@@ -243,24 +230,15 @@ class Handle(object):
             shells = crud.list_shells()
 
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
         elif str(type_) == '4':
             tag = select_from_tags()
-            if not tag:
-                display.display_text(STANDARD_MESSAGES['tags_not_found'])
-                cls.handle_option_1()
             shells = crud.get_shells_from_tag(tag)
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
 
         return note
 
-    @classmethod
-    def handle_option_4(cls, type_=None, id_=None, text=None):
+    @staticmethod
+    def handle_option_4(type_=None, id_=None, text=None):
         """
         TODO(nirabhra): Add option to read by id
         OPERATION: READ
@@ -301,9 +279,6 @@ class Handle(object):
             shells = crud.search_shell(text)
 
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
         elif str(type_) == '2':
             if not id_:
                 id_ = prompt_tk('\nEnter id of the note to view: ')
@@ -316,24 +291,10 @@ class Handle(object):
             shells = crud.list_shells()
 
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
         elif str(type_) == '4':
             tag = select_from_tags()
-            if not tag:
-                display.display_text(STANDARD_MESSAGES['tags_not_found'])
-                cls.handle_option_1()
-
-            if not tag:
-                display.display_text(STANDARD_MESSAGES['tags_not_found'])
-                cls.handle_option_1()
-
             shells = crud.get_shells_from_tag(tag)
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
 
         display.display_text(f'Vision  :   {note.get("vision")}\n')
         display.display_text(f'Thought :   {note.get("thought")}\n\n')
@@ -349,8 +310,8 @@ class Handle(object):
 
         return True
 
-    @classmethod
-    def handle_option_5(cls, type_=None, index=None, shell_id=None, confirm=False):
+    @staticmethod
+    def handle_option_5(type_=None, index=None, shell_id=None, confirm=False):
         """
         OPERATION: DELETE
         Delete a Note
@@ -390,14 +351,8 @@ class Handle(object):
             shells = crud.search_shell(text)
 
             note = select_from_shells(shells)
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
         elif str(type_) == '3':
             note = select_from_shells()
-            if not note:
-                display.display_text(STANDARD_MESSAGES['notes_not_found'])
-                cls.handle_option_1()
 
         key = 'n'
         if not confirm:
@@ -431,16 +386,13 @@ class Handle(object):
 
         return True
 
-    @classmethod
-    def handle_option_7(cls, tag_name=None):
+    @staticmethod
+    def handle_option_7(tag_name=None):
         """
         OPERATION: READ
         List all Notes for a Tag
         """
         tag_name = tag_name or select_from_tags()
-        if not tag_name:
-            display.display_text(STANDARD_MESSAGES['tags_not_found'])
-            cls.handle_option_1()
 
         shells = crud.get_shells_from_tag(tag_name)
         display.display_notes(shells)
@@ -456,9 +408,6 @@ class Handle(object):
         Delete a Tag (select from list)
         """
         tag_name = select_from_tags()
-        if not tag_name:
-            display.display_text(STANDARD_MESSAGES['tags_not_found'])
-            cls.handle_option_1()
 
         key = 'n'
         skip_note_delete = False
@@ -513,6 +462,41 @@ class Handle(object):
         crud.update_shell_search(note['shell_id'], vision, thought)
 
         return True
+
+    @staticmethod
+    def handle_option_11(delay=None, title=None, body=None):
+        """
+        OPERATION: CREATE
+        Create a Reminder
+        """
+        if not title:
+            title = prompt_tk('Title: ')
+        if not body:
+            body = prompt_tk('Details(optional)?: ')
+        if not delay:
+            delay = int(prompt_tk('Enter delay(in sec): '))
+
+        try:
+            r = create_reminder(delay, title, body)
+        except Exception as e:
+            display.display_text(f'Error: {str(e)}')
+
+    @classmethod
+    def handle_option_q(cls):
+        """
+        Done for now? - Exit :)
+        """
+        farewell_text = 'Thankyou for using notes!\nBye 🖐'
+
+        total_animation_time = 1.5
+        animation_speed = total_animation_time / len(farewell_text)
+        for i in range(0, len(farewell_text)):
+            display.display_text(farewell_text[i])
+            sleep(animation_speed)
+
+        sleep(0.75)
+
+        return False
 
     @staticmethod
     def incorrect_option():
