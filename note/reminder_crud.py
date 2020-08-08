@@ -31,7 +31,7 @@ def list_reminders_from_shell_id(shell_id: str) -> list:
     """ Db reminder : List All Reminders with shell ids """
 
     query = '''
-                SELECT reminder_id, target_time from reminder where shell_id=?;
+                SELECT reminder_id, pid, target_time from reminder where shell_id=?;
             '''
     cur = conn.cursor()
     cur.execute(query, [shell_id])
@@ -39,7 +39,8 @@ def list_reminders_from_shell_id(shell_id: str) -> list:
     for row in cur:
         data.append({
             'reminder_id': row[0],
-            'target_time': row[1],
+            'pid': row[1],
+            'target_time': row[2],
         })
     return data
 
@@ -60,8 +61,25 @@ def get_reminder_from_id(id_: str ='') -> dict:
 
     return data
 
+def update_reminder_pid(rowid, pid):
+    """ Db reminder : Update reminder pid """
+    query = f'UPDATE reminder SET pid=? WHERE rowid=?;'
+    cur = conn.cursor()
+    cur.execute(query, (pid, rowid))
+    conn.commit()
+    return cur.lastrowid
+
+def delete_reminder_by_rowid(id_: str = ''):
+    """ Db reminder : Delete reminder from rowid """
+
+    query = f'DELETE FROM reminder WHERE rowid=?;'
+    cur = conn.cursor()
+    cur.execute(query, [id_])
+    conn.commit()
+    return cur.lastrowid
+
 def delete_reminder_by_shell_id(id_: str = ''):
-    """ Db reminder : Get reminder from shell id """
+    """ Db reminder : Delete reminder from shell id """
 
     query = f'DELETE FROM reminder WHERE shell_id=?;'
     cur = conn.cursor()

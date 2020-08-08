@@ -3,24 +3,35 @@ import time
 import sys
 import os
 import logging
+from note.reminder_crud import update_reminder_pid, delete_reminder_by_rowid
 
 def notify(title, body):
     """ Notify """
     os.system(f'notify-send -u critical "{title}" "{body}"')
 
-def _create_reminder(delay, title, body=''):
+def _create_reminder(rowid, delay, title, body=''):
     """ Create a reminder """
     # Store pid for termination
     pid = os.getpid()
-    logging.info(f'Starting reminder on process {pid}')
+
+    try:
+        update_reminder_pid(rowid, pid)
+    except Exception:
+        pass
 
     time.sleep(delay)
     notify(title, body)
 
-    logging.info(f'Exiting reminder on process {pid}')
+    try:
+        delete_reminder_by_rowid(rowid)
+
+    except Exception:
+        pass
+
+    os._exit(0)
 
 
-def create_reminder(delay, title, body=''):
+def create_reminder(rowid, delay, title, body='', ):
     """ Create reminder """
     # Fork the current process
 
@@ -34,4 +45,4 @@ def create_reminder(delay, title, body=''):
         return True
 
     # Continue with forked code
-    _create_reminder(delay, title, body)
+    _create_reminder(rowid, delay, title, body)
