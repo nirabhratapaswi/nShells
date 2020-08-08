@@ -228,19 +228,12 @@ def delete_shell_search_by_tag_name(name):
                 );
             '''
     cur = conn.cursor()
-    cur.execute(f'SELECT shell_id FROM shells WHERE tag_name={name};')
-    print('result 1: ', cur.lastrowid)
-    cur = conn.cursor()
-    cur.execute(f'SELECT * FROM shells_search WHERE shell_id IN (SELECT shell_id FROM shells WHERE tag_name={name});')
-    print('result 2: ', cur.lastrowid)
-    cur = conn.cursor()
     cur.execute(query, [name])
     conn.commit()
     return cur.lastrowid
 
 def search_shell(text):
     """ Db shells_search : Search in shells for text """
-    print('text to match: ', text)
     query = f'''SELECT shell_id, vision, thought, tag_name, created FROM shells WHERE shell_id IN
                 (
                     SELECT shell_id FROM shells_search

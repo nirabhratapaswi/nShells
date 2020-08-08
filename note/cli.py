@@ -1,4 +1,4 @@
-from note.handler import handle
+from note.note_handler import handle
 from note.display import DisplayModule as display
 from note.reminder import create_reminder
 
