@@ -45,7 +45,7 @@ conn = create_connection(DB_FILE)
 tables = (
     'CREATE TABLE IF NOT EXISTS shells(shell_id TEXT PRIMARY KEY, vision TEXT, \
                                         thought TEXT, tag_name TEXT, created timestamp);',
-    'CREATE TABLE IF NOT EXISTS reminder(reminder_id TEXT PRIMARY KEY, \
+    'CREATE TABLE IF NOT EXISTS reminder(reminder_id TEXT PRIMARY KEY, pid TEXT, \
                                         target_time timestamp, shell_id TEXT);',
     'CREATE TABLE IF NOT EXISTS shells_tags(shell_id TEXT, tag_id TEXT);',
     'CREATE TABLE IF NOT EXISTS tags(tag_id TEXT PRIMARY KEY, tag_name TEXT);',
