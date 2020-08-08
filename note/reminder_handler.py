@@ -152,9 +152,9 @@ class ReminderHandle(object):
 
                 # Create database entries
                 note_crud.create_shell(shell_data)
-                crud.create_reminder(reminder_data)
+                rowid = crud.create_reminder(reminder_data)
 
-                create_reminder(delay, title, body)
+                create_reminder(rowid, delay, title, body)
             except Exception as e:
                 display.display_text(f'Error: {str(e)}')
         elif str(type_) == '2':
@@ -180,9 +180,9 @@ class ReminderHandle(object):
                 reminder_id = str(uuid.uuid4()).replace('-', '')
                 reminder_data = (reminder_id, target_time, note['shell_id'])
 
-                crud.create_reminder(reminder_data)
+                rowid = crud.create_reminder(reminder_data)
 
-                create_reminder(delay, title, body)
+                create_reminder(rowid, delay, title, body)
 
         return True
 
@@ -247,6 +247,10 @@ class ReminderHandle(object):
             display.display_text(f'\n')
 
         if key == 'y' or key == 'Y' or confirm:
+            reminders = crud.list_reminders_from_shell_id(note['shell_id'])
+            for reminder in reminders:
+                if reminder['pid'] != '-1':
+                    os.system(f'kill -9 {reminder["pid"]}')
             crud.delete_reminder_by_shell_id(note['shell_id'])
             if note['tag_name'] == cls._default_tag_name:
                 note_crud.delete_shell(note['shell_id'])
